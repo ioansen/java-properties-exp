@@ -5,7 +5,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import org.apache.tika.Tika;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,6 +19,11 @@ import java.net.URLConnection;
 public class AppTest 
 {
     private String path = System.getProperty("user.dir") + "\\src\\main\\resources\\EmptyFrame-1.0.jar";
+
+
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
+
 
     @Test
     public void mimeTypeShouldBeJar() {
@@ -44,11 +51,14 @@ public class AppTest
     }
 
     @Test
-    public void runJarShouldReturnOne()
-    {
+    public void runJarShouldThrowException(){
         String errPath = path.replace('E', 'm');
-        assertEquals("Error code must be 1",1, App.runJar(errPath));
+
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage(errPath + " -- file doesn't exist or is not a jar");
+        App.runJar(errPath);
     }
+
 
     @Test
     public void deleteJarShouldReturnZero()

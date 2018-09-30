@@ -33,7 +33,7 @@ public class App
     }
 
 
-    private static int testIfJar(String path){
+    private static void testIfJar(String path) throws IllegalArgumentException{
         File file = new File(path);
         if(file.exists() && !file.isDirectory()) {
             Tika tika = new Tika();
@@ -41,23 +41,20 @@ public class App
                 String mimeType = tika.detect(file);
 
                 if(mimeType.equals("application/java-archive")){
-                    return 0;
+                    return;
                 }
             } catch (IOException e){
                 e.printStackTrace();
             }
         }
-        System.out.println(path + " -- file doesn't exist or is not a jar");
-        System.out.println();
-        return 1;
+
+        throw new IllegalArgumentException(path + " -- file doesn't exist or is not a jar");
     }
 
 
-    public static int runJar(String path, String... args ){
+    public static int runJar(String path, String... args ) throws IllegalArgumentException{
 
-        if (testIfJar(path) == 1){
-            return 1;
-        }
+        testIfJar(path);
 
         String custtomId = genCustomId();
         boolean succsefullStart = false;
