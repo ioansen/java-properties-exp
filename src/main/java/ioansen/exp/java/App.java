@@ -1,7 +1,12 @@
 package ioansen.exp.java;
 
 
+import org.apache.tika.Tika;
+
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,7 +33,31 @@ public class App
     }
 
 
+    private static int testIfJar(String path){
+        File file = new File(path);
+        if(file.exists() && !file.isDirectory()) {
+            Tika tika = new Tika();
+            try {
+                String mimeType = tika.detect(file);
+
+                if(mimeType.equals("application/java-archive")){
+                    return 0;
+                }
+            } catch (IOException e){
+                e.printStackTrace();
+            }
+        }
+        System.out.println(path + " -- file doesn't exist or is not a jar");
+        System.out.println();
+        return 1;
+    }
+
+
     public static int runJar(String path, String... args ){
+
+        if (testIfJar(path) == 1){
+            return 1;
+        }
 
         String custtomId = genCustomId();
         boolean succsefullStart = false;
