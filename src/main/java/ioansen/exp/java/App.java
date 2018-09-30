@@ -4,15 +4,11 @@ package ioansen.exp.java;
 import org.apache.tika.Tika;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
-import java.util.prefs.Preferences;
 
 public class App
 {
@@ -63,10 +59,7 @@ public class App
         try {
 
             System.out.println("Attempting to start jar");
-            Process startJar = new ProcessBuilder(createCmd(custtomId, path, args))
-                    .redirectErrorStream(true)
-                    .redirectOutput(ProcessBuilder.Redirect.INHERIT)
-                    .start();
+            new ProcessBuilder(createCmd(custtomId, path, args)).start();
 
 
             System.out.println("Searching if jar is running");
@@ -112,8 +105,6 @@ public class App
             try(OutputStream out = new FileOutputStream( "C://temp//jarPid.txt")){
                 props.store(out, "The pid of the last jar started by properties app ");
             }
-
-
         }
         catch (IOException e ) {
             e.printStackTrace();
@@ -137,12 +128,11 @@ public class App
         try {
             String pid = getStoredId();
             System.out.println("Attempting to delete process: " + getStoredId());
-            Process search = new ProcessBuilder
-                    ("wmic", "process", getStoredId(), "delete")
+            new ProcessBuilder("wmic", "process", getStoredId(), "delete")
                     .redirectErrorStream(true)
                     .redirectOutput(ProcessBuilder.Redirect.INHERIT)
                     .start();
-            System.out.println("Process " + pid + " deleted succesfully");
+            System.out.println("Process " + pid + " deleted successfully");
             System.out.println();
             return 0;
         }catch (IOException e){
