@@ -16,7 +16,7 @@ public class AppTest
     public void runJarShouldReturnZero()
     {
         assertEquals("Error code must be 0",0, App.runJar(path));
-        assertEquals("Error code must be 0",0, App.runJar(path));
+       // assertEquals("Error code must be 0",0, App.runJar(path));
     }
 
     @Test
@@ -26,4 +26,9 @@ public class AppTest
         assertEquals("Error code must be 1",1, App.runJar(errPath));
     }
 
+    @Test
+    public void deleteJarShouldReturnZero()
+    {
+        assertEquals("Error code must be 0",0, App.stopJar());
+    }
 }

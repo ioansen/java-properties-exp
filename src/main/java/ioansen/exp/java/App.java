@@ -1,9 +1,7 @@
 package ioansen.exp.java;
 
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -45,12 +43,11 @@ public class App
                     .start();
 
 
-            System.out.println("Searching if process is running");
+            System.out.println("Searching if jar is running");
             Process search = new ProcessBuilder("wmic", "process",
                     "where", "\"CommandLine like '%" + custtomId +"%'\"",
                     "get", "Name,", "ProcessId,", "CommandLine",
                     "/format:csv")
-                    .redirectErrorStream(true)
                     .start();
 
             try(BufferedReader searchReader = new BufferedReader(new InputStreamReader(search.getInputStream()))) {
@@ -69,6 +66,7 @@ public class App
             if ( succsefullStart){
                     System.out.println("Jar running under pid: " + pid);
                     System.out.println();
+                    storeId(String.valueOf(pid));
                     return 0;
             }
         } catch (IOException e){
@@ -80,14 +78,52 @@ public class App
     }
 
 
-    private static void storeSystemPreferenceId(String pid){
-        Preferences prefs = Preferences.systemRoot().node(App.class.getName());
-        prefs.put("jarId", pid);
+    private static void storeId(String pid){
+        try {
+            Properties props = new Properties();
+            props.setProperty("jarPid", pid);
+
+            try(OutputStream out = new FileOutputStream( "C://temp//jarPid.txt")){
+                props.store(out, "The pid of the last jar started by properties app ");
+            }
+
+
+        }
+        catch (IOException e ) {
+            e.printStackTrace();
+        }
+
     }
 
-    private static String getSystemPreferenceId(){
-        Preferences prefs = Preferences.systemRoot().node(App.class.getName());
-        return prefs.get("jarId", "-1");
+    private static String getStoredId(){
+        Properties props = new Properties();
+
+        try (InputStream is = new FileInputStream("C://temp//jarPid.txt")){
+            props.load(is);
+        } catch ( IOException e ) { e.printStackTrace();}
+
+        return  props.getProperty("jarPid", "-1");
+
+    }
+
+
+    public static int stopJar(){
+        try {
+            String pid = getStoredId();
+            System.out.println("Attempting to delete process: " + getStoredId());
+            Process search = new ProcessBuilder
+                    ("wmic", "process", getStoredId(), "delete")
+                    .redirectErrorStream(true)
+                    .redirectOutput(ProcessBuilder.Redirect.INHERIT)
+                    .start();
+            System.out.println("Process " + pid + " deleted succesfully");
+            System.out.println();
+            return 0;
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+        System.out.println();
+        return 1;
     }
 
 
